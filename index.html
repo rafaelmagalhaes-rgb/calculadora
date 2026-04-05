@@ -828,9 +828,9 @@ function calcular(){
 
   // Rival
   const usaRival=document.getElementById('usar_rival')?.checked;
-  let rivalLiqs=null,rivalAvg=0,rivalNome='Concorrente',rivalYr=0;
+  let rivalLiqs=null,rivalParcs=null,rivalAvg=0,rivalNome='Concorrente',rivalYr=0;
   if(usaRival){
-    rivalLiqs=[];
+    rivalLiqs=[];rivalParcs=[];
     rivalNome=currentRival==='kiwify'?'Kiwify':currentRival==='hubla'?'Hubla':currentRival==='gateway'?'Gateway':'Outro';
     const rivalCobraAluno=document.getElementById('rival_cobra_aluno')?.checked;
     const usandoLiqs=rivalMode==='liq';
@@ -844,23 +844,29 @@ function calcular(){
     }
 
     for(let n=1;n<=12;n++){
-      let rv=null;
+      let rv=null,rp=null;
       if(usandoLiqs){
-        // Modo líquidos manuais — usar direto
         rv=fv('rv_liq_'+n)||null;
-      } else if(currentRival==='kiwify'){
-        rv=kiwifyLiq(P,fv('rv_taxa'),fv('rv_fix'),fv('rv_rep'),n,rivalCobraAluno,taxaParc);
-      } else if(currentRival==='hubla'){
-        rv=hublaLiq(P,fv('rv_taxa'),fv('rv_fix'),fv('rv_rep'),n,rivalCobraAluno,taxaParc);
+        // No modo manual a parcela do aluno foi informada diretamente
+        rp=fv('rv_parc_'+n)||null;
+      } else if(currentRival==='kiwify'||currentRival==='hubla'){
+        const r=taxaParc/100;
+        rv=currentRival==='kiwify'
+          ?kiwifyLiq(P,fv('rv_taxa'),fv('rv_fix'),fv('rv_rep'),n,rivalCobraAluno,taxaParc)
+          :hublaLiq(P,fv('rv_taxa'),fv('rv_fix'),fv('rv_rep'),n,rivalCobraAluno,taxaParc);
+        rp=n===1?P:(rivalCobraAluno?pmt(r,n,P):P/n);
       } else if(currentRival==='gateway'){
+        const GW_RATES=[0,3.5654,3.9836,4.2172,4.3589,4.4501,4.5089,4.5467,4.5702,4.5832,4.5895,4.5900];
+        const r=GW_RATES[n-1]/100;
         rv=gwLiq(P,fv('gw_mdr_'+n),fv('gw_fix'),n,rivalCobraAluno);
+        rp=n===1?P:(rivalCobraAluno?pmt(r,n,P):P/n);
       } else {
-        // Outro — taxa plana
-        const taxa=fv('outro_taxa'),fix=fv('outro_fix');
-        if(rivalCobraAluno){rv=P*(1-taxa/100)-fix;}
-        else{const r=taxaParc/100;const pvR=pvAnnuity(r,n,P/n);rv=pvR*(1-taxa/100)-fix;}
+        const taxa=fv('outro_taxa'),fix=fv('outro_fix'),r=taxaParc/100;
+        if(rivalCobraAluno){rv=P*(1-taxa/100)-fix;rp=n===1?P:pmt(r,n,P);}
+        else{const pvR=pvAnnuity(r,n,P/n);rv=pvR*(1-taxa/100)-fix;rp=P/n;}
       }
       rivalLiqs.push(rv);
+      rivalParcs.push(rp);
     }
     for(let n=0;n<12;n++)if(rivalLiqs[n]!=null)rivalAvg+=rivalLiqs[n]*weights[n];
     rivalYr=rivalAvg*nVendas;
@@ -924,7 +930,12 @@ function calcular(){
     });
     if(usaRival&&rivalLiqs){
       const rv=rivalLiqs[n-1];
-      html+=`<td style="${rv===bestV?'font-weight:700':'color:var(--muted)'}">${fmt(rv)}</td>`;
+      const rp=rivalParcs&&rivalParcs[n-1];
+      const rvParcTxt=n===1
+        ?`<div style="font-size:10px;color:#888;margin-top:2px">valor à vista</div>`
+        :(rp?`<div style="font-size:11px;color:#AAA;margin-top:3px;font-weight:600">${fmt(rp)}<span style="font-weight:400;font-size:10px">/parc.</span></div>`:'');
+      const isBestRv=rv===bestV;
+      html+=`<td style="${isBestRv?'font-weight:700':'color:var(--muted)'};line-height:1.2"><div>${fmt(rv)}</div>${rvParcTxt}</td>`;
     } else if(usaRival){
       html+=`<td>—</td>`;
     }
