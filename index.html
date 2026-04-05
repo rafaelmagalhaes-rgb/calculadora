@@ -7,10 +7,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --hm:#FF4B00;--hm2:#FF6A2A;--hm-dark:#CC3D00;--hm-bg:rgba(255,75,0,.08);
+  --hm:#FF4B00;--hm2:#FF6A2A;--hm-bg:rgba(255,75,0,.08);
   --bg:#0D0D0D;--surface:#161616;--surface2:#1E1E1E;--surface3:#252525;
   --border:#2A2A2A;--border2:#383838;
-  --text:#F5F5F0;--muted:#8A8A85;--subtle:#484845;
+  --text:#F5F5F0;--muted:#8A8A85;--subtle:#707070;
   --blue:#3D8EFF;--blue-bg:rgba(61,142,255,.07);
   --green:#00C97A;--green-bg:rgba(0,201,122,.07);
   --gold:#FFB800;--gold-bg:rgba(255,184,0,.07);
@@ -25,8 +25,8 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito Sans',sans-serif
 .header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:100;display:flex;align-items:center;height:56px;gap:16px}
 .hm-logo-wrap{display:flex;align-items:center;flex-shrink:0}
 .header-divider{width:1px;height:20px;background:var(--border2);flex-shrink:0}
-.header-title{font-size:13px;font-weight:700;color:var(--text);letter-spacing:.1px}
-.header-sub{font-size:11px;color:var(--subtle);margin-left:auto;font-family:var(--mono);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:3px 8px}
+.header-title{font-size:13px;font-weight:700;color:var(--text)}
+.header-sub{font-size:11px;color:var(--muted);margin-left:auto;font-family:var(--mono);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:3px 8px}
 
 /* PROGRESS */
 .progress{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:stretch;height:42px;gap:0;overflow-x:auto}
@@ -112,7 +112,7 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito Sans',sans-serif
 .btn-row{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:12px 24px;display:flex;gap:10px;justify-content:flex-end;z-index:90}
 .btn{padding:10px 24px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;border:none;font-family:'Nunito Sans',sans-serif}
 .btn-primary{background:linear-gradient(135deg,var(--hm) 0%,var(--hm2) 100%);color:#fff;box-shadow:0 2px 12px rgba(255,75,0,.25)}
-.btn-primary:hover{background:linear-gradient(135deg,var(--hm2) 0%,#FF8A50 100%);box-shadow:0 4px 18px rgba(255,75,0,.35);transform:translateY(-1px)}
+.btn-primary:hover{background:linear-gradient(135deg,var(--hm2) 0%,#FF8A50 100%);transform:translateY(-1px)}
 .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border2)}
 .btn-ghost:hover{color:var(--text);border-color:var(--border2)}
 .btn-sm{padding:7px 14px;font-size:12px;border-radius:8px}
@@ -239,13 +239,13 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito Sans',sans-serif
     <div class="page-desc">Quantos cenários você quer comparar?</div>
   </div>
 
-  <div style="display:flex;gap:8px;margin-bottom:20px;align-items:center">
+  <div style="display:flex;gap:8px;margin-bottom:20px">
     <div class="radio-btn active" id="nscen_1" onclick="setNScen(1)">1 cenário</div>
     <div class="radio-btn" id="nscen_2" onclick="setNScen(2)">2 cenários</div>
     <div class="radio-btn" id="nscen_3" onclick="setNScen(3)">3 cenários</div>
   </div>
 
-  <div class="scen-tabs" id="scen_tabs_wrap">
+  <div class="scen-tabs">
     <div class="scen-tab active-s1" id="tab_s1" onclick="showScen(1)">Cenário 1</div>
     <div class="scen-tab" id="tab_s2" onclick="showScen(2)" style="display:none">Cenário 2</div>
     <div class="scen-tab" id="tab_s3" onclick="showScen(3)" style="display:none">Cenário 3</div>
@@ -400,9 +400,9 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito Sans',sans-serif
           <th id="th_rv" style="color:var(--hm)">—</th>
           <th>Melhor</th>
         </tr>
-        <tr>
+        <tr style="border-bottom:1px solid var(--border)">
           <th colspan="2"></th>
-          <th colspan="3" style="font-size:9px;color:var(--subtle);font-weight:400;letter-spacing:.3px;padding-bottom:6px">líquido produtor · parcela do aluno</th>
+          <th colspan="3" style="font-size:10px;color:#777;font-weight:500;padding-bottom:7px;letter-spacing:.2px">↑ líquido produtor &nbsp;·&nbsp; ↓ parcela do aluno</th>
           <th></th><th></th>
         </tr>
       </thead>
@@ -551,21 +551,16 @@ function liveUpdate(){
 
 // ── CENÁRIOS ─────────────────────────────────────────────────────────
 let activeScen=1;
-let nScens=1; // quantos cenários ativos
+let nScens=1;
 
 function setNScen(n){
   nScens=n;
-  // Botões de seleção
   [1,2,3].forEach(i=>{
     const btn=document.getElementById('nscen_'+i);
     if(btn)btn.classList.toggle('active',i===n);
-  });
-  // Mostrar/ocultar tabs
-  [1,2,3].forEach(i=>{
     const tab=document.getElementById('tab_s'+i);
     if(tab)tab.style.display=i<=n?'':'none';
   });
-  // Se cenário ativo foi desativado, voltar para o 1
   if(activeScen>n)showScen(1);
   else showScen(activeScen);
 }
@@ -575,12 +570,11 @@ function showScen(n){
   [1,2,3].forEach(i=>{
     document.getElementById('scen'+i).classList.toggle('active',i===n);
     const tab=document.getElementById('tab_s'+i);
-    if(!tab)return;
+    if(!tab||i>nScens)return;
     const colors=['active-s1','active-s2','active-s3'];
     tab.className='scen-tab'+(i===n?' '+colors[i-1]:'');
-    if(i!==n){tab.style.opacity='0.5';tab.style.borderColor='';tab.style.color='';}
-    else{tab.style.opacity='1';}
-    if(i>nScens)tab.style.display='none';
+    tab.style.opacity=i===n?'1':'0.5';
+    if(i!==n){tab.style.borderColor='';tab.style.color='';}
   });
 }
 
@@ -595,15 +589,17 @@ function updateScen(){
     const rp=fv('s'+i+'_rp');
     const ra=cobra?fv('s'+i+'_ra'):rp;
     const spread=(ra-rp).toFixed(2);
+    const repasse=ra>0?((ra-rp)/ra*100).toFixed(2):0;
     if(spBox){
+      spBox.style.borderColor='';
       if(cobra&&ra>rp){
-        spBox.textContent=`Spread positivo: aluno paga ${ra}% a.m., produtor é cobrado ${rp}% a.m. — diferença de ${spread}% a.m. vai para o produtor no parcelado.`;
+        spBox.innerHTML=`Spread positivo: aluno paga <strong>${ra}% a.m.</strong>, produtor é cobrado <strong>${rp}% a.m.</strong> — diferença de <strong>${spread}% a.m.</strong> vai para o produtor no parcelado.<br><span style="color:var(--green);font-weight:600">Repasse efetivo: ${repasse}% dos juros cobrados do aluno ficam com o produtor.</span>`;
         spBox.style.display='block';
       } else if(cobra&&ra===rp){
         spBox.textContent=`Taxa aluno = taxa D30: produtor não lucra no parcelamento, mas também não perde.`;
         spBox.style.display='block';
       } else if(cobra&&ra<rp){
-        spBox.textContent=`⚠ Taxa aluno menor que D30: produtor perde no parcelamento.`;
+        spBox.innerHTML=`⚠ Taxa aluno menor que D30: produtor <strong>perde</strong> no parcelamento — absorve ${Math.abs(spread)}% a.m. de custo não coberto.`;
         spBox.style.display='block';spBox.style.borderColor='#664400';
       } else {
         spBox.textContent=`Produtor absorve o custo do parcelamento: cada parcela adicional reduz o líquido.`;
@@ -923,8 +919,8 @@ function calcular(){
       if(i>=nScens){html+=`<td style="display:none"></td>`;return;}
       const s=scens[i];
       const isBest=s.liqs[n-1]===bestV;
-      const parcTxt=n===1?'':`<div style="font-size:10px;color:var(--subtle);margin-top:2px;font-weight:400">${fmt(s.parcs[n-1])}/parc.</div>`;
-      html+=`<td class="${isBest?'best '+cls[i]:cls[i]}" style="line-height:1.3"><div>${fmt(s.liqs[n-1])}</div>${parcTxt}</td>`;
+      const parcTxt=n===1?`<div style="font-size:10px;color:#888;margin-top:2px">valor à vista</div>`:`<div style="font-size:11px;color:#AAA;margin-top:3px;font-weight:600">${fmt(s.parcs[n-1])}<span style="font-weight:400;font-size:10px">/parc.</span></div>`;
+      html+=`<td class="${isBest?'best '+cls[i]:cls[i]}" style="line-height:1.2"><div>${fmt(s.liqs[n-1])}</div>${parcTxt}</td>`;
     });
     if(usaRival&&rivalLiqs){
       const rv=rivalLiqs[n-1];
@@ -952,10 +948,9 @@ function goTo(n){
 
 function resetar(){window.location.href=window.location.pathname;}
 
-// ── COMPARTILHAR (URL STATE) ──────────────────────────────────────────
+// ── COMPARTILHAR ──────────────────────────────────────────────────────
 const CAMPOS_SIMPLES=['P','fat','pay_pix','pay_bol','pay_cc','s1_nome','s1_fee','s1_fix','s1_rp','s1_ra','s2_nome','s2_fee','s2_fix','s2_rp','s2_ra','s3_nome','s3_fee','s3_fix','s3_rp','s3_ra','rv_taxa','rv_fix','rv_taxa_parc','rv_rep','outro_taxa','outro_fix','gw_fix'];
 const CAMPOS_CHECK=['s1_cobra_aluno','s2_cobra_aluno','s3_cobra_aluno','usar_rival','rival_cobra_aluno'];
-
 function serializarEstado(){
   const s={};
   CAMPOS_SIMPLES.forEach(id=>{const el=document.getElementById(id);if(el)s[id]=el.value;});
@@ -967,7 +962,6 @@ function serializarEstado(){
   s['_rival']=currentRival;s['_rivalMode']=rivalMode;s['_nScens']=String(nScens);
   return s;
 }
-
 function deserializarEstado(s){
   CAMPOS_SIMPLES.forEach(id=>{if(s[id]!==undefined){const el=document.getElementById(id);if(el)el.value=s[id];}});
   CAMPOS_CHECK.forEach(id=>{if(s[id]!==undefined){const el=document.getElementById(id);if(el)el.checked=s[id]==='1';}});
@@ -979,41 +973,30 @@ function deserializarEstado(s){
   if(s['_rivalMode'])rivalMode=s['_rivalMode'];
   if(s['_nScens'])setNScen(parseInt(s['_nScens']));
 }
-
 function gerarURL(){
-  const s=serializarEstado();
-  const b64=btoa(unescape(encodeURIComponent(JSON.stringify(s))));
+  const b64=btoa(unescape(encodeURIComponent(JSON.stringify(serializarEstado()))));
   return window.location.origin+window.location.pathname+'#s='+b64;
 }
-
 function compartilhar(){
   document.getElementById('share_url_box').value=gerarURL();
   document.getElementById('share_modal').style.display='flex';
   setTimeout(()=>document.getElementById('share_url_box').select(),50);
 }
-
 function fecharModal(){document.getElementById('share_modal').style.display='none';}
-
 function copiarURL(){
   const box=document.getElementById('share_url_box');box.select();
-  const url=box.value;
-  if(navigator.clipboard&&window.isSecureContext){
-    navigator.clipboard.writeText(url).then(flashCopiar).catch(()=>copiarFallback());
-  } else {copiarFallback();}
+  if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(box.value).then(flashCopiar).catch(()=>copiarFallback());
+  else copiarFallback();
 }
-
 function copiarFallback(){
-  const box=document.getElementById('share_url_box');box.select();
-  try{document.execCommand('copy');flashCopiar();}
-  catch(e){document.getElementById('btn_copiar').textContent='Ctrl+C para copiar';}
+  document.getElementById('share_url_box').select();
+  try{document.execCommand('copy');flashCopiar();}catch(e){document.getElementById('btn_copiar').textContent='Ctrl+C para copiar';}
 }
-
 function flashCopiar(){
   const btn=document.getElementById('btn_copiar');
   btn.textContent='✓ Copiado!';btn.style.background='var(--green)';btn.style.color='#000';
   setTimeout(()=>{btn.textContent='Copiar link';btn.style.background='';btn.style.color='';},2200);
 }
-
 function carregarDaURL(){
   const hash=window.location.hash;
   if(!hash.startsWith('#s='))return false;
