@@ -7,19 +7,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* Hotmart brand */
   --hm:#FF4B00;--hm2:#FF6A2A;--hm-dark:#CC3D00;--hm-bg:rgba(255,75,0,.08);
-  /* Backgrounds */
   --bg:#0D0D0D;--surface:#161616;--surface2:#1E1E1E;--surface3:#252525;
-  /* Borders */
   --border:#2A2A2A;--border2:#383838;
-  /* Text */
   --text:#F5F5F0;--muted:#8A8A85;--subtle:#484845;
-  /* Accents */
   --blue:#3D8EFF;--blue-bg:rgba(61,142,255,.07);
   --green:#00C97A;--green-bg:rgba(0,201,122,.07);
   --gold:#FFB800;--gold-bg:rgba(255,184,0,.07);
-  /* Shape */
   --radius:10px;--radius-lg:14px;
   --mono:'JetBrains Mono',monospace;
 }
@@ -38,11 +32,11 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito Sans',sans-serif
 .progress{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:stretch;height:42px;gap:0;overflow-x:auto}
 .prog-step{display:flex;align-items:center;gap:8px;padding:0 16px 0 0;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;white-space:nowrap;opacity:.4}
 .prog-step.active{opacity:1;border-bottom-color:var(--hm)}
-.prog-step.done{opacity:.7;cursor:pointer}
-.prog-num{width:20px;height:20px;border-radius:50%;background:var(--surface3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;font-family:var(--mono);flex-shrink:0}
-.prog-step.active .prog-num{background:var(--hm);color:#fff;border-color:var(--hm);box-shadow:0 0 0 3px var(--hm-bg)}
+.prog-step.done{opacity:.65;cursor:pointer}
+.prog-num{width:18px;height:18px;border-radius:50%;background:var(--surface3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;font-family:var(--mono);flex-shrink:0}
+.prog-step.active .prog-num{background:var(--hm);color:#fff;border-color:var(--hm)}
 .prog-step.done .prog-num{background:var(--green);color:#000;border-color:var(--green)}
-.prog-label{font-size:11px;font-weight:700;letter-spacing:.1px}
+.prog-label{font-size:11px;font-weight:500}
 .prog-sep{width:12px;height:1px;background:var(--border);flex-shrink:0;margin:0 2px;align-self:center}
 
 /* MAIN */
@@ -167,13 +161,10 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito Sans',sans-serif
 
 <div class="header">
   <div class="hm-logo-wrap">
-    <!-- Hotmart flame + wordmark SVG -->
     <svg width="110" height="24" viewBox="0 0 110 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- Flame icon -->
       <path d="M10.5 2C10.5 2 5.5 7.5 5.5 12.5C5.5 15.49 7.76 18 10.5 18C13.24 18 15.5 15.49 15.5 12.5C15.5 7.5 10.5 2 10.5 2Z" fill="#FF4B00"/>
       <circle cx="10.5" cy="14.5" r="4" fill="#FF4B00"/>
       <circle cx="10.5" cy="14.5" r="2" fill="#0D0D0D"/>
-      <!-- hotmart wordmark -->
       <text x="24" y="17" font-family="Nunito Sans, sans-serif" font-weight="800" font-size="14" fill="#F5F5F0" letter-spacing="-0.3">hotmart</text>
     </svg>
   </div>
@@ -245,13 +236,19 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito Sans',sans-serif
   <div class="page-head">
     <div class="page-num">Passo 2 de 4</div>
     <div class="page-title">Cenários <em>Hotmart</em></div>
-    <div class="page-desc">Configure até 3 cenários para comparar. Ex: taxa atual vs proposta A vs proposta B.</div>
+    <div class="page-desc">Quantos cenários você quer comparar?</div>
   </div>
 
-  <div class="scen-tabs">
-    <div class="scen-tab active-s1" onclick="showScen(1)">Cenário 1</div>
-    <div class="scen-tab" onclick="showScen(2)" style="border-color:var(--blue);color:var(--blue);opacity:.5">Cenário 2</div>
-    <div class="scen-tab" onclick="showScen(3)" style="border-color:var(--gold);color:var(--gold);opacity:.5">Cenário 3</div>
+  <div style="display:flex;gap:8px;margin-bottom:20px;align-items:center">
+    <div class="radio-btn active" id="nscen_1" onclick="setNScen(1)">1 cenário</div>
+    <div class="radio-btn" id="nscen_2" onclick="setNScen(2)">2 cenários</div>
+    <div class="radio-btn" id="nscen_3" onclick="setNScen(3)">3 cenários</div>
+  </div>
+
+  <div class="scen-tabs" id="scen_tabs_wrap">
+    <div class="scen-tab active-s1" id="tab_s1" onclick="showScen(1)">Cenário 1</div>
+    <div class="scen-tab" id="tab_s2" onclick="showScen(2)" style="display:none">Cenário 2</div>
+    <div class="scen-tab" id="tab_s3" onclick="showScen(3)" style="display:none">Cenário 3</div>
   </div>
 
   <!-- S1 -->
@@ -403,6 +400,11 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito Sans',sans-serif
           <th id="th_rv" style="color:var(--hm)">—</th>
           <th>Melhor</th>
         </tr>
+        <tr>
+          <th colspan="2"></th>
+          <th colspan="3" style="font-size:9px;color:var(--subtle);font-weight:400;letter-spacing:.3px;padding-bottom:6px">líquido produtor · parcela do aluno</th>
+          <th></th><th></th>
+        </tr>
       </thead>
       <tbody id="cmp_body"></tbody>
     </table>
@@ -422,7 +424,7 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito Sans',sans-serif
       <div style="font-size:15px;font-weight:800;color:var(--text)">Compartilhar simulação</div>
     </div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6;margin-left:42px">Qualquer pessoa com este link verá a simulação exatamente como está agora.</div>
-    <textarea id="share_url_box" readonly onclick="this.select()" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--mono);font-size:11px;resize:none;height:68px;outline:none;line-height:1.6;transition:border-color .15s" onfocus="this.style.borderColor='var(--hm)'"></textarea>
+    <textarea id="share_url_box" readonly onclick="this.select()" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--mono);font-size:11px;resize:none;height:68px;outline:none;line-height:1.6"></textarea>
     <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
       <button class="btn btn-ghost btn-sm" onclick="fecharModal()">Fechar</button>
       <button class="btn btn-primary btn-sm" id="btn_copiar" onclick="copiarURL()">Copiar link</button>
@@ -461,6 +463,12 @@ function hmLiq(P,fee,ra,rp,fix,n,cobraAluno){
     const custoFinanceiro=P-pvRecebido; // desconto pelo prazo
     return base - custoFinanceiro*(1-f);
   }
+}
+
+function hmParc(P,ra,n,cobraAluno){
+  if(n===1)return P;
+  if(cobraAluno)return pmt(ra/100,n,P);
+  return P/n;
 }
 
 function kiwifyLiq(P,taxa,fix,rep,n,cobraAluno,taxaParc=3.19){
@@ -543,15 +551,36 @@ function liveUpdate(){
 
 // ── CENÁRIOS ─────────────────────────────────────────────────────────
 let activeScen=1;
+let nScens=1; // quantos cenários ativos
+
+function setNScen(n){
+  nScens=n;
+  // Botões de seleção
+  [1,2,3].forEach(i=>{
+    const btn=document.getElementById('nscen_'+i);
+    if(btn)btn.classList.toggle('active',i===n);
+  });
+  // Mostrar/ocultar tabs
+  [1,2,3].forEach(i=>{
+    const tab=document.getElementById('tab_s'+i);
+    if(tab)tab.style.display=i<=n?'':'none';
+  });
+  // Se cenário ativo foi desativado, voltar para o 1
+  if(activeScen>n)showScen(1);
+  else showScen(activeScen);
+}
+
 function showScen(n){
   activeScen=n;
   [1,2,3].forEach(i=>{
     document.getElementById('scen'+i).classList.toggle('active',i===n);
-    const tabs=document.querySelectorAll('.scen-tab');
+    const tab=document.getElementById('tab_s'+i);
+    if(!tab)return;
     const colors=['active-s1','active-s2','active-s3'];
-    tabs[i-1].className='scen-tab'+(i===n?' '+colors[i-1]:'');
-    if(i!==n){tabs[i-1].style.opacity='0.5';tabs[i-1].style.borderColor='';tabs[i-1].style.color='';}
-    else{tabs[i-1].style.opacity='1';}
+    tab.className='scen-tab'+(i===n?' '+colors[i-1]:'');
+    if(i!==n){tab.style.opacity='0.5';tab.style.borderColor='';tab.style.color='';}
+    else{tab.style.opacity='1';}
+    if(i>nScens)tab.style.display='none';
   });
 }
 
@@ -786,15 +815,19 @@ function calcular(){
 
   // 3 cenários HM
   const scens=[];
-  [1,2,3].forEach(i=>{
+  const activeScenIds=[...Array(nScens).keys()].map(x=>x+1);
+  activeScenIds.forEach(i=>{
     const fee=fv('s'+i+'_fee'),rp=fv('s'+i+'_rp'),fix=fv('s'+i+'_fix');
     const cobra=document.getElementById('s'+i+'_cobra_aluno')?.checked;
     const ra=cobra?fv('s'+i+'_ra'):rp;
     const nome=sv('s'+i+'_nome')||'Cenário '+i;
-    const liqs=[];
-    for(let n=1;n<=12;n++)liqs.push(hmLiq(P,fee,ra,rp,fix,n,cobra));
+    const liqs=[],parcs=[];
+    for(let n=1;n<=12;n++){
+      liqs.push(hmLiq(P,fee,ra,rp,fix,n,cobra));
+      parcs.push(hmParc(P,ra,n,cobra));
+    }
     let avg=0;for(let n=0;n<12;n++)avg+=liqs[n]*weights[n];
-    scens.push({nome,fee,rp,ra,fix,cobra,liqs,avg,yr:avg*nVendas});
+    scens.push({nome,fee,rp,ra,fix,cobra,liqs,parcs,avg,yr:avg*nVendas});
   });
 
   // Rival
@@ -841,7 +874,10 @@ function calcular(){
 
   // Cabeçalhos tabela
   const colors=['s1c','s2c','s3c'];
-  [1,2,3].forEach(i=>document.getElementById('th_s'+i).textContent=scens[i-1].nome);
+  [1,2,3].forEach(i=>{
+    const th=document.getElementById('th_s'+i);
+    if(th){th.textContent=i<=nScens?scens[i-1].nome:'';th.style.display=i<=nScens?'':'none';}
+  });
   const thRv=document.getElementById('th_rv');
   thRv.textContent=usaRival?rivalNome:'';
   thRv.style.display=usaRival?'':'none';
@@ -883,9 +919,12 @@ function calcular(){
     if([1,6,12].includes(n))tr.className='hl';
     let html=`<td>${n}x${n===1?' (à vista)':''}</td><td style="color:var(--muted)">${(w*100).toFixed(1)}%</td>`;
     const cls=['s1c','s2c','s3c'];
-    scens.forEach((s,i)=>{
+    [0,1,2].forEach(i=>{
+      if(i>=nScens){html+=`<td style="display:none"></td>`;return;}
+      const s=scens[i];
       const isBest=s.liqs[n-1]===bestV;
-      html+=`<td class="${isBest?'best '+cls[i]:cls[i]}">${fmt(s.liqs[n-1])}</td>`;
+      const parcTxt=n===1?'':`<div style="font-size:10px;color:var(--subtle);margin-top:2px;font-weight:400">${fmt(s.parcs[n-1])}/parc.</div>`;
+      html+=`<td class="${isBest?'best '+cls[i]:cls[i]}" style="line-height:1.3"><div>${fmt(s.liqs[n-1])}</div>${parcTxt}</td>`;
     });
     if(usaRival&&rivalLiqs){
       const rv=rivalLiqs[n-1];
@@ -925,7 +964,7 @@ function serializarEstado(){
     ['mix_','rv_parc_','rv_liq_'].forEach(p=>{const el=document.getElementById(p+n);if(el&&el.value)s[p+n]=el.value;});
     const gw=document.getElementById('gw_mdr_'+n);if(gw&&gw.value)s['gw_mdr_'+n]=gw.value;
   }
-  s['_rival']=currentRival;s['_rivalMode']=rivalMode;
+  s['_rival']=currentRival;s['_rivalMode']=rivalMode;s['_nScens']=String(nScens);
   return s;
 }
 
@@ -938,6 +977,7 @@ function deserializarEstado(s){
   }
   if(s['_rival'])currentRival=s['_rival'];
   if(s['_rivalMode'])rivalMode=s['_rivalMode'];
+  if(s['_nScens'])setNScen(parseInt(s['_nScens']));
 }
 
 function gerarURL(){
@@ -948,8 +988,7 @@ function gerarURL(){
 
 function compartilhar(){
   document.getElementById('share_url_box').value=gerarURL();
-  const modal=document.getElementById('share_modal');
-  modal.style.display='flex';
+  document.getElementById('share_modal').style.display='flex';
   setTimeout(()=>document.getElementById('share_url_box').select(),50);
 }
 
@@ -993,7 +1032,7 @@ function carregarDaURL(){
 }
 
 // ── INIT ─────────────────────────────────────────────────────────────
-liveUpdate();onPay();onMix();updateScen();
+liveUpdate();onPay();onMix();updateScen();setNScen(1);
 carregarDaURL();
 </script>
 </body>
