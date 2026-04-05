@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador Interno — Hotmart</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Hotmart brand */
+  --hm:#FF4B00;--hm2:#FF6A2A;--hm-dark:#CC3D00;--hm-bg:rgba(255,75,0,.08);
+  /* Backgrounds */
+  --bg:#0D0D0D;--surface:#161616;--surface2:#1E1E1E;--surface3:#252525;
+  /* Borders */
+  --border:#2A2A2A;--border2:#383838;
+  /* Text */
+  --text:#F5F5F0;--muted:#8A8A85;--subtle:#484845;
+  /* Accents */
+  --blue:#3D8EFF;--blue-bg:rgba(61,142,255,.07);
+  --green:#00C97A;--green-bg:rgba(0,201,122,.07);
+  --gold:#FFB800;--gold-bg:rgba(255,184,0,.07);
+  /* Shape */
+  --radius:10px;--radius-lg:14px;
+  --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Nunito Sans',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* HEADER */
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:100;display:flex;align-items:center;height:56px;gap:16px}
+.hm-logo-wrap{display:flex;align-items:center;flex-shrink:0}
+.header-divider{width:1px;height:20px;background:var(--border2);flex-shrink:0}
+.header-title{font-size:13px;font-weight:700;color:var(--text);letter-spacing:.1px}
+.header-sub{font-size:11px;color:var(--subtle);margin-left:auto;font-family:var(--mono);background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:3px 8px}
+
+/* PROGRESS */
+.progress{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:stretch;height:42px;gap:0;overflow-x:auto}
+.prog-step{display:flex;align-items:center;gap:8px;padding:0 16px 0 0;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;white-space:nowrap;opacity:.4}
+.prog-step.active{opacity:1;border-bottom-color:var(--hm)}
+.prog-step.done{opacity:.7;cursor:pointer}
+.prog-num{width:20px;height:20px;border-radius:50%;background:var(--surface3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;font-family:var(--mono);flex-shrink:0}
+.prog-step.active .prog-num{background:var(--hm);color:#fff;border-color:var(--hm);box-shadow:0 0 0 3px var(--hm-bg)}
+.prog-step.done .prog-num{background:var(--green);color:#000;border-color:var(--green)}
+.prog-label{font-size:11px;font-weight:700;letter-spacing:.1px}
+.prog-sep{width:12px;height:1px;background:var(--border);flex-shrink:0;margin:0 2px;align-self:center}
+
+/* MAIN */
+.main{max-width:860px;margin:0 auto;padding:28px 24px 80px}
+.page{display:none}
+.page.active{display:block;animation:fadeUp .2s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.page-head{margin-bottom:24px}
+.page-num{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:4px;font-family:var(--mono)}
+.page-title{font-size:24px;font-weight:800;letter-spacing:-.5px;line-height:1.2}
+.page-title em{color:var(--hm);font-style:normal}
+.page-desc{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.6}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;margin-bottom:12px;transition:border-color .15s}.card:hover{border-color:var(--border2)}
+.card-head{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card-head .dot{width:6px;height:6px;border-radius:50%;background:var(--hm);flex-shrink:0}
+
+/* FIELDS */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.3px}
+.field input[type=number],.field select{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'Nunito Sans',sans-serif;font-size:14px;outline:none;transition:border-color .15s;-moz-appearance:textfield;width:100%}
+.field input:focus,.field select:focus{border-color:var(--hm)}
+.field select option{background:var(--surface2)}
+.field input::-webkit-inner-spin-button,.field input::-webkit-outer-spin-button{-webkit-appearance:none}
+.hint{font-size:11px;color:var(--subtle);margin-top:2px;line-height:1.4}
+
+/* TOGGLE / RADIO */
+.radio-group{display:flex;gap:8px;flex-wrap:wrap}
+.radio-btn{display:flex;align-items:center;gap:6px;padding:7px 12px;border:1px solid var(--border2);border-radius:8px;cursor:pointer;font-size:12px;font-weight:500;color:var(--muted);transition:all .15s;user-select:none}
+.radio-btn:hover{border-color:var(--border2);color:var(--text)}
+.radio-btn.active{border-color:var(--hm);color:var(--hm);background:var(--hm-bg)}
+.radio-btn input{display:none}
+
+/* TOGGLE SWITCH */
+.toggle-wrap{display:flex;align-items:center;gap:10px}
+.toggle{position:relative;width:36px;height:20px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--surface3);border:1px solid var(--border2);border-radius:20px;cursor:pointer;transition:.2s}
+.toggle-slider:before{content:'';position:absolute;width:14px;height:14px;left:2px;top:2px;background:var(--muted);border-radius:50%;transition:.2s}
+.toggle input:checked+.toggle-slider{background:var(--hm-bg);border-color:var(--hm)}
+.toggle input:checked+.toggle-slider:before{transform:translateX(16px);background:var(--hm)}
+.toggle-label{font-size:13px;font-weight:500;color:var(--text)}
+
+/* INFO BOX */
+.info-box{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 13px;font-size:12px;color:var(--muted);line-height:1.5;font-family:var(--mono);margin-top:10px}
+.info-box.warn{border-color:#664400;background:var(--gold-bg);color:var(--gold)}
+
+/* MIX */
+.mix-wrap{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:8px}
+.mix-item{display:flex;flex-direction:column;align-items:center;gap:3px}
+.mix-item span{font-size:10px;color:var(--muted);font-family:var(--mono)}
+.mix-item input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 4px;color:var(--text);font-size:12px;text-align:center;outline:none;font-family:var(--mono);-moz-appearance:textfield}
+.mix-item input:focus{border-color:var(--hm)}
+.mix-item input::-webkit-inner-spin-button,.mix-item input::-webkit-outer-spin-button{-webkit-appearance:none}
+.total-check{font-size:11px;margin-top:6px;font-family:var(--mono);font-weight:600}
+.total-ok{color:var(--green)}
+.total-err{color:var(--hm)}
+
+/* SCENARIO TABS */
+.scen-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.scen-tab{padding:6px 14px;border-radius:8px;border:1px solid var(--border2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;color:var(--muted);font-family:var(--mono)}
+.scen-tab.active-s1{border-color:var(--hm);color:var(--hm);background:var(--hm-bg)}
+.scen-tab.active-s2{border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
+.scen-tab.active-s3{border-color:var(--gold);color:var(--gold);background:var(--gold-bg)}
+.scen-panel{display:none}
+.scen-panel.active{display:block}
+
+/* BUTTONS */
+.btn-row{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:12px 24px;display:flex;gap:10px;justify-content:flex-end;z-index:90}
+.btn{padding:10px 24px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;border:none;font-family:'Nunito Sans',sans-serif}
+.btn-primary{background:linear-gradient(135deg,var(--hm) 0%,var(--hm2) 100%);color:#fff;box-shadow:0 2px 12px rgba(255,75,0,.25)}
+.btn-primary:hover{background:linear-gradient(135deg,var(--hm2) 0%,#FF8A50 100%);box-shadow:0 4px 18px rgba(255,75,0,.35);transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border2)}
+.btn-ghost:hover{color:var(--text);border-color:var(--border2)}
+.btn-sm{padding:7px 14px;font-size:12px;border-radius:8px}
+
+/* RESULTS */
+.verdict{border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:16px;display:flex;align-items:center;gap:16px}
+.verdict.win{background:var(--green-bg);border:1.5px solid rgba(68,204,136,.25)}
+.verdict.neutral{background:var(--surface);border:1px solid var(--border)}
+.verdict-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:4px}
+.verdict-value{font-size:22px;font-weight:700;font-family:var(--mono);color:var(--green)}
+.verdict-sub{font-size:12px;color:var(--muted);margin-top:2px}
+
+.result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.result-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;position:relative;overflow:hidden}
+.result-card.s1{border-top:2.5px solid var(--hm)}
+.result-card.s2{border-top:2.5px solid var(--blue)}
+.result-card.s3{border-top:2.5px solid var(--gold)}
+.rc-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.s1 .rc-label{color:var(--hm)}
+.s2 .rc-label{color:var(--blue)}
+.s3 .rc-label{color:var(--gold)}
+.rc-value{font-size:22px;font-weight:700;font-family:var(--mono)}
+.s1 .rc-value{color:var(--hm)}
+.s2 .rc-value{color:var(--blue)}
+.s3 .rc-value{color:var(--gold)}
+.rc-sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+.cmp-table{width:100%;border-collapse:collapse;font-size:12px;font-family:var(--mono)}
+.cmp-table th{text-align:left;padding:7px 10px;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border);font-weight:600}
+.cmp-table td{padding:7px 10px;border-bottom:1px solid var(--border);color:var(--text)}
+.cmp-table tr.hl td{background:var(--surface2)}
+.cmp-table .best{font-weight:700}
+.s1c{color:var(--hm)}
+.s2c{color:var(--blue)}
+.s3c{color:var(--gold)}
+
+/* RIVAL SECTION */
+.rival-toggle{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.rival-tab{padding:6px 14px;border:1px solid var(--border2);border-radius:8px;cursor:pointer;font-size:12px;font-weight:500;color:var(--muted);transition:all .15s}
+.rival-tab.active{border-color:var(--hm);color:var(--hm);background:var(--hm-bg)}
+
+.section-sep{height:1px;background:var(--border);margin:20px 0}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="hm-logo-wrap">
+    <!-- Hotmart flame + wordmark SVG -->
+    <svg width="110" height="24" viewBox="0 0 110 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Flame icon -->
+      <path d="M10.5 2C10.5 2 5.5 7.5 5.5 12.5C5.5 15.49 7.76 18 10.5 18C13.24 18 15.5 15.49 15.5 12.5C15.5 7.5 10.5 2 10.5 2Z" fill="#FF4B00"/>
+      <circle cx="10.5" cy="14.5" r="4" fill="#FF4B00"/>
+      <circle cx="10.5" cy="14.5" r="2" fill="#0D0D0D"/>
+      <!-- hotmart wordmark -->
+      <text x="24" y="17" font-family="Nunito Sans, sans-serif" font-weight="800" font-size="14" fill="#F5F5F0" letter-spacing="-0.3">hotmart</text>
+    </svg>
+  </div>
+  <div class="header-divider"></div>
+  <div class="header-title">Simulador de Tarifas</div>
+  <div class="header-sub">uso interno · AM</div>
+</div>
+
+<div class="progress" id="progress_bar">
+  <div class="prog-step active" data-step="1" onclick="goTo(1)">
+    <div class="prog-num">1</div><div class="prog-label">Dados do cliente</div>
+  </div>
+  <div class="prog-sep"></div>
+  <div class="prog-step" data-step="2" onclick="goTo(2)">
+    <div class="prog-num">2</div><div class="prog-label">Cenários Hotmart</div>
+  </div>
+  <div class="prog-sep"></div>
+  <div class="prog-step" data-step="3" onclick="goTo(3)">
+    <div class="prog-num">3</div><div class="prog-label">Concorrente</div>
+  </div>
+  <div class="prog-sep"></div>
+  <div class="prog-step" data-step="4" onclick="goTo(4)">
+    <div class="prog-num">4</div><div class="prog-label">Resultado</div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- PASSO 1 -->
+<div class="page active" id="page1">
+  <div class="page-head">
+    <div class="page-num">Passo 1 de 4</div>
+    <div class="page-title">Dados do <em>cliente</em></div>
+    <div class="page-desc">Preencha o produto e o volume. O mix de parcelamento pode ser ajustado se souber o real.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="dot"></div>Produto e faturamento</div>
+    <div class="grid2">
+      <div class="field"><label>Preço do produto (R$)</label><input type="number" id="P" value="1000" min="1" step="1" oninput="liveUpdate()"></div>
+      <div class="field"><label>Faturamento anual (R$)</label><input type="number" id="fat" value="1000000" step="10000" oninput="liveUpdate()"></div>
+    </div>
+    <div class="info-box" id="nv_box">≈ 1.000 vendas/ano com produto de R$1.000,00</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="dot"></div>Forma de pagamento</div>
+    <div class="grid3">
+      <div class="field"><label>Pix (%)</label><input type="number" id="pay_pix" value="10" step="0.1" min="0" max="100" oninput="onPay()"></div>
+      <div class="field"><label>Boleto (%)</label><input type="number" id="pay_bol" value="0.7" step="0.1" min="0" max="100" oninput="onPay()"></div>
+      <div class="field"><label>Cartão (%)</label><input type="number" id="pay_cc" value="89.3" step="0.1" min="0" max="100" oninput="onPay()"></div>
+    </div>
+    <div class="total-check total-ok" id="pay_total">Total: 100,0%</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="dot"></div>Mix de parcelamento no cartão <span style="font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--subtle)">(% de cada N — soma 100%)</span></div>
+    <div class="mix-wrap" id="mix_wrap"></div>
+    <div class="total-check total-ok" id="mix_total" style="margin-top:8px">Total: 100,0%</div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="goTo(2)">Próximo: cenários Hotmart →</button>
+  </div>
+</div>
+
+<!-- PASSO 2 -->
+<div class="page" id="page2">
+  <div class="page-head">
+    <div class="page-num">Passo 2 de 4</div>
+    <div class="page-title">Cenários <em>Hotmart</em></div>
+    <div class="page-desc">Configure até 3 cenários para comparar. Ex: taxa atual vs proposta A vs proposta B.</div>
+  </div>
+
+  <div class="scen-tabs">
+    <div class="scen-tab active-s1" onclick="showScen(1)">Cenário 1</div>
+    <div class="scen-tab" onclick="showScen(2)" style="border-color:var(--blue);color:var(--blue);opacity:.5">Cenário 2</div>
+    <div class="scen-tab" onclick="showScen(3)" style="border-color:var(--gold);color:var(--gold);opacity:.5">Cenário 3</div>
+  </div>
+
+  <!-- S1 -->
+  <div class="scen-panel active" id="scen1">
+    <div class="card">
+      <div class="card-head" style="color:var(--hm)"><div class="dot"></div>Cenário 1 — Hotmart</div>
+      <div class="grid2">
+        <div class="field"><label>Nome do cenário</label><input type="text" id="s1_nome" value="Atual" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:14px;outline:none;width:100%"></div>
+        <div class="field"><label>Tarifa Hotmart (%)</label><input type="number" id="s1_fee" value="8.4" step="0.1" oninput="updateScen()"></div>
+        <div class="field"><label>Fixo por transação (R$)</label><input type="number" id="s1_fix" value="1.00" step="0.01"></div>
+        <div class="field"><label>Taxa antecipação D30 — cobrada do produtor (% a.m.)</label><input type="number" id="s1_rp" value="3.49" step="0.01" oninput="updateScen()"></div>
+      </div>
+      <div class="section-sep"></div>
+      <div class="toggle-wrap" style="margin-bottom:12px">
+        <label class="toggle"><input type="checkbox" id="s1_cobra_aluno" checked onchange="updateScen()"><div class="toggle-slider"></div></label>
+        <span class="toggle-label">Cobrar juros do aluno no parcelado</span>
+      </div>
+      <div id="s1_aluno_row">
+        <div class="grid2">
+          <div class="field"><label>Taxa repassada ao aluno (% a.m.)</label><input type="number" id="s1_ra" value="3.49" step="0.01" oninput="updateScen()">
+            <span class="hint">Pode ser maior que o D30 — a diferença vai para o produtor</span>
+          </div>
+        </div>
+      </div>
+      <div id="s1_sem_juros_box" style="display:none" class="info-box warn">Produtor assume o custo do parcelamento. Líquido decresce a cada parcela.</div>
+      <div class="info-box" id="s1_spread_box" style="margin-top:10px"></div>
+    </div>
+  </div>
+
+  <!-- S2 -->
+  <div class="scen-panel" id="scen2">
+    <div class="card" style="border-color:rgba(68,136,255,.2)">
+      <div class="card-head" style="color:var(--blue)"><div class="dot" style="background:var(--blue)"></div>Cenário 2 — Hotmart</div>
+      <div class="grid2">
+        <div class="field"><label>Nome do cenário</label><input type="text" id="s2_nome" value="Proposta A" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:14px;outline:none;width:100%"></div>
+        <div class="field"><label>Tarifa Hotmart (%)</label><input type="number" id="s2_fee" value="7.9" step="0.1" oninput="updateScen()"></div>
+        <div class="field"><label>Fixo por transação (R$)</label><input type="number" id="s2_fix" value="1.00" step="0.01"></div>
+        <div class="field"><label>Taxa antecipação D30 — cobrada do produtor (% a.m.)</label><input type="number" id="s2_rp" value="2.99" step="0.01" oninput="updateScen()"></div>
+      </div>
+      <div class="section-sep"></div>
+      <div class="toggle-wrap" style="margin-bottom:12px">
+        <label class="toggle"><input type="checkbox" id="s2_cobra_aluno" checked onchange="updateScen()"><div class="toggle-slider"></div></label>
+        <span class="toggle-label">Cobrar juros do aluno no parcelado</span>
+      </div>
+      <div id="s2_aluno_row">
+        <div class="grid2">
+          <div class="field"><label>Taxa repassada ao aluno (% a.m.)</label><input type="number" id="s2_ra" value="3.49" step="0.01" oninput="updateScen()"></div>
+        </div>
+      </div>
+      <div id="s2_sem_juros_box" style="display:none" class="info-box warn">Produtor assume o custo do parcelamento.</div>
+      <div class="info-box" id="s2_spread_box" style="margin-top:10px"></div>
+    </div>
+  </div>
+
+  <!-- S3 -->
+  <div class="scen-panel" id="scen3">
+    <div class="card" style="border-color:rgba(255,204,68,.2)">
+      <div class="card-head" style="color:var(--gold)"><div class="dot" style="background:var(--gold)"></div>Cenário 3 — Hotmart</div>
+      <div class="grid2">
+        <div class="field"><label>Nome do cenário</label><input type="text" id="s3_nome" value="Proposta B" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:14px;outline:none;width:100%"></div>
+        <div class="field"><label>Tarifa Hotmart (%)</label><input type="number" id="s3_fee" value="7.4" step="0.1" oninput="updateScen()"></div>
+        <div class="field"><label>Fixo por transação (R$)</label><input type="number" id="s3_fix" value="1.00" step="0.01"></div>
+        <div class="field"><label>Taxa antecipação D30 — cobrada do produtor (% a.m.)</label><input type="number" id="s3_rp" value="2.99" step="0.01" oninput="updateScen()"></div>
+      </div>
+      <div class="section-sep"></div>
+      <div class="toggle-wrap" style="margin-bottom:12px">
+        <label class="toggle"><input type="checkbox" id="s3_cobra_aluno" checked onchange="updateScen()"><div class="toggle-slider"></div></label>
+        <span class="toggle-label">Cobrar juros do aluno no parcelado</span>
+      </div>
+      <div id="s3_aluno_row">
+        <div class="grid2">
+          <div class="field"><label>Taxa repassada ao aluno (% a.m.)</label><input type="number" id="s3_ra" value="3.49" step="0.01" oninput="updateScen()"></div>
+        </div>
+      </div>
+      <div id="s3_sem_juros_box" style="display:none" class="info-box warn">Produtor assume o custo do parcelamento.</div>
+      <div class="info-box" id="s3_spread_box" style="margin-top:10px"></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goTo(1)">← Voltar</button>
+    <button class="btn btn-primary" onclick="goTo(3)">Próximo: concorrente →</button>
+  </div>
+</div>
+
+<!-- PASSO 3 -->
+<div class="page" id="page3">
+  <div class="page-head">
+    <div class="page-num">Passo 3 de 4</div>
+    <div class="page-title">Comparar com <em>concorrente</em></div>
+    <div class="page-desc">Opcional. Se preencher, o resultado vai incluir o comparativo.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="dot"></div>Incluir concorrente?</div>
+    <div class="toggle-wrap">
+      <label class="toggle"><input type="checkbox" id="usar_rival" onchange="toggleRival()"><div class="toggle-slider"></div></label>
+      <span class="toggle-label">Comparar com proposta do concorrente</span>
+    </div>
+  </div>
+
+  <div id="rival_section" style="display:none">
+    <div class="card">
+      <div class="card-head"><div class="dot"></div>Plataforma</div>
+      <div class="rival-toggle">
+        <div class="rival-tab active" data-rival="kiwify" onclick="setRival('kiwify')">Kiwify</div>
+        <div class="rival-tab" data-rival="hubla" onclick="setRival('hubla')">Hubla</div>
+        <div class="rival-tab" data-rival="gateway" onclick="setRival('gateway')">Gateway / PagarMe</div>
+        <div class="rival-tab" data-rival="outro" onclick="setRival('outro')">Outro</div>
+      </div>
+    </div>
+
+    <div id="rival_form"></div>
+
+    <div class="card">
+      <div class="card-head"><div class="dot"></div>Juros do aluno no concorrente</div>
+      <div class="toggle-wrap">
+        <label class="toggle"><input type="checkbox" id="rival_cobra_aluno" checked><div class="toggle-slider"></div></label>
+        <span class="toggle-label">Concorrente cobra juros do aluno no parcelado</span>
+      </div>
+      <div class="hint" style="margin-top:8px">Se não cobrar, os juros ficam com o concorrente / são absorvidos pela plataforma.</div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goTo(2)">← Voltar</button>
+    <button class="btn btn-primary" onclick="calcular()">Calcular →</button>
+  </div>
+</div>
+
+<!-- PASSO 4 -->
+<div class="page" id="page4">
+  <div class="page-head">
+    <div class="page-num">Passo 4 de 4</div>
+    <div class="page-title"><em>Resultado</em></div>
+  </div>
+
+  <div id="be_box"></div>
+
+  <div class="card">
+    <div class="card-head"><div class="dot"></div>Líquido por parcela — todos os cenários</div>
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th>N</th><th>Peso</th>
+          <th id="th_s1" class="s1c">—</th>
+          <th id="th_s2" class="s2c">—</th>
+          <th id="th_s3" class="s3c">—</th>
+          <th id="th_rv" style="color:var(--hm)">—</th>
+          <th>Melhor</th>
+        </tr>
+      </thead>
+      <tbody id="cmp_body"></tbody>
+    </table>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goTo(3)">← Voltar</button>
+    <button class="btn btn-ghost btn-sm" onclick="resetar()">Nova simulação</button>
+    <button class="btn btn-primary btn-sm" onclick="compartilhar()">🔗 Compartilhar link</button>
+  </div>
+</div>
+
+<div id="share_modal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);align-items:center;justify-content:center">
+  <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:24px;max-width:540px;width:90%;margin:0 24px;box-shadow:0 24px 64px rgba(0,0,0,.6)">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <div style="width:32px;height:32px;background:var(--hm-bg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">🔗</div>
+      <div style="font-size:15px;font-weight:800;color:var(--text)">Compartilhar simulação</div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6;margin-left:42px">Qualquer pessoa com este link verá a simulação exatamente como está agora.</div>
+    <textarea id="share_url_box" readonly onclick="this.select()" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--mono);font-size:11px;resize:none;height:68px;outline:none;line-height:1.6;transition:border-color .15s" onfocus="this.style.borderColor='var(--hm)'"></textarea>
+    <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+      <button class="btn btn-ghost btn-sm" onclick="fecharModal()">Fechar</button>
+      <button class="btn btn-primary btn-sm" id="btn_copiar" onclick="copiarURL()">Copiar link</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// ── HELPERS ──────────────────────────────────────────────────────────
+function fmt(v){return v==null?'—':'R$'+v.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.')}
+function fmtM(v){if(v==null)return'—';const s=v<0?'-':'';const a=Math.abs(v);if(a>=1e6)return s+'R$'+(a/1e6).toFixed(2).replace('.',',')+'M';if(a>=1e3)return s+'R$'+(a/1e3).toFixed(1).replace('.',',')+'K';return s+'R$'+a.toFixed(0)}
+function fv(id){return parseFloat(document.getElementById(id)?.value)||0}
+function sv(id){return document.getElementById(id)?.value||''}
+
+// ── FÓRMULAS ─────────────────────────────────────────────────────────
+function pmt(r,n,pv){if(n===1)return pv;if(r===0)return pv/n;return pv*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);}
+function pvAnnuity(r,n,p){if(r===0)return p*n;return p*(1-Math.pow(1+r,-n))/r;}
+
+function hmLiq(P,fee,ra,rp,fix,n,cobraAluno){
+  const f=fee/100,r=rp/100;
+  const base=P*(1-f)-fix;
+  if(n===1)return base;
+  if(cobraAluno){
+    // Aluno paga juros: produtor recebe spread entre ra e rp
+    const pA=pmt(ra/100,n,P);
+    const pP=pmt(r,n,P);
+    const spread=pvAnnuity(r,n,pA-pP)*(1-f);
+    return base+spread;
+  } else {
+    // Produtor absorve: aluno paga P/n sem juros, Hotmart cobra D30 do produtor
+    // Custo financeiro = P - PV(rp, n, P/n) — custo de antecipar n parcelas iguais
+    const parcAluno=P/n;
+    const pvRecebido=pvAnnuity(r,n,parcAluno); // valor presente das parcelas a D30
+    const custoFinanceiro=P-pvRecebido; // desconto pelo prazo
+    return base - custoFinanceiro*(1-f);
+  }
+}
+
+function kiwifyLiq(P,taxa,fix,rep,n,cobraAluno,taxaParc=3.19){
+  const f=taxa/100,r=taxaParc/100;
+  const base=P*(1-f)-fix;
+  if(n===1)return base;
+  if(cobraAluno){
+    const parc=pmt(r,n,P);
+    const juros=parc*n-P;
+    return base+juros*(rep/100);
+  } else {
+    // Aluno paga P/n — produtor absorve o custo financeiro
+    const pvRecebido=pvAnnuity(r,n,P/n);
+    const custoFinanceiro=P-pvRecebido;
+    return base-custoFinanceiro*(1-f);
+  }
+}
+
+function hublaLiq(P,taxaEf,fix,rep,n,cobraAluno,taxaParc=3.19){
+  const f=taxaEf/100;
+  const base=P*(1-f)-fix;
+  const r=taxaParc/100;
+  if(n===1)return base;
+  if(cobraAluno){
+    const parc=pmt(r,n,P);
+    const juros=parc*n-P;
+    return base+juros*(rep/100);
+  } else {
+    const pvRecebido=pvAnnuity(r,n,P/n);
+    const custoFinanceiro=P-pvRecebido;
+    return base-custoFinanceiro*(1-f);
+  }
+}
+
+function gwLiq(P,mdr,fix,n,cobraAluno){
+  const GW_RATES=[0,3.5654,3.9836,4.2172,4.3589,4.4501,4.5089,4.5467,4.5702,4.5832,4.5895,4.5900];
+  const r=GW_RATES[n-1]/100;
+  if(n===1){
+    // 1x: sem parcelamento, MDR direto
+    return P*(1-mdr/100)-fix;
+  }
+  if(cobraAluno){
+    const parc=pmt(r,n,P);
+    const total=parc*n;
+    return total*(1-mdr/100)-fix;
+  } else {
+    // Aluno paga P/n — gateway cobra MDR sobre o valor presente das parcelas
+    const pvRecebido=pvAnnuity(r,n,P/n);
+    return pvRecebido*(1-mdr/100)-fix;
+  }
+}
+
+// ── INIT MIX ─────────────────────────────────────────────────────────
+const defaultMix=[20,2,1,1,1,1,1,1,1,1,1,69];
+(function initMix(){
+  const w=document.getElementById('mix_wrap');
+  for(let n=1;n<=12;n++){
+    const d=document.createElement('div');d.className='mix-item';
+    d.innerHTML=`<span>${n}x</span><input type="number" id="mix_${n}" value="${defaultMix[n-1]}" min="0" max="100" step="1" oninput="onMix()">`;
+    w.appendChild(d);
+  }
+})();
+
+function onMix(){
+  let t=0;for(let n=1;n<=12;n++)t+=fv('mix_'+n);
+  const el=document.getElementById('mix_total');
+  el.textContent=`Total: ${t.toFixed(1)}%`;el.className='total-check '+(Math.abs(t-100)<0.3?'total-ok':'total-err');
+}
+
+function onPay(){
+  const v=fv('pay_pix')+fv('pay_bol')+fv('pay_cc');
+  const el=document.getElementById('pay_total');
+  el.textContent=`Total: ${v.toFixed(1)}%`;el.className='total-check '+(Math.abs(v-100)<0.3?'total-ok':'total-err');
+}
+
+function liveUpdate(){
+  const P=fv('P'),fat=fv('fat');
+  if(P>0)document.getElementById('nv_box').textContent=`≈ ${Math.round(fat/P).toLocaleString('pt-BR')} vendas/ano com produto de ${fmt(P)}`;
+}
+
+// ── CENÁRIOS ─────────────────────────────────────────────────────────
+let activeScen=1;
+function showScen(n){
+  activeScen=n;
+  [1,2,3].forEach(i=>{
+    document.getElementById('scen'+i).classList.toggle('active',i===n);
+    const tabs=document.querySelectorAll('.scen-tab');
+    const colors=['active-s1','active-s2','active-s3'];
+    tabs[i-1].className='scen-tab'+(i===n?' '+colors[i-1]:'');
+    if(i!==n){tabs[i-1].style.opacity='0.5';tabs[i-1].style.borderColor='';tabs[i-1].style.color='';}
+    else{tabs[i-1].style.opacity='1';}
+  });
+}
+
+function updateScen(){
+  [1,2,3].forEach(i=>{
+    const cobra=document.getElementById('s'+i+'_cobra_aluno')?.checked;
+    const aRow=document.getElementById('s'+i+'_aluno_row');
+    const sBox=document.getElementById('s'+i+'_sem_juros_box');
+    const spBox=document.getElementById('s'+i+'_spread_box');
+    if(aRow)aRow.style.display=cobra?'block':'none';
+    if(sBox)sBox.style.display=cobra?'none':'block';
+    const rp=fv('s'+i+'_rp');
+    const ra=cobra?fv('s'+i+'_ra'):rp;
+    const spread=(ra-rp).toFixed(2);
+    if(spBox){
+      if(cobra&&ra>rp){
+        spBox.textContent=`Spread positivo: aluno paga ${ra}% a.m., produtor é cobrado ${rp}% a.m. — diferença de ${spread}% a.m. vai para o produtor no parcelado.`;
+        spBox.style.display='block';
+      } else if(cobra&&ra===rp){
+        spBox.textContent=`Taxa aluno = taxa D30: produtor não lucra no parcelamento, mas também não perde.`;
+        spBox.style.display='block';
+      } else if(cobra&&ra<rp){
+        spBox.textContent=`⚠ Taxa aluno menor que D30: produtor perde no parcelamento.`;
+        spBox.style.display='block';spBox.style.borderColor='#664400';
+      } else {
+        spBox.textContent=`Produtor absorve o custo do parcelamento: cada parcela adicional reduz o líquido.`;
+        spBox.style.display='block';
+      }
+    }
+  });
+}
+
+// ── RIVAL ────────────────────────────────────────────────────────────
+let currentRival='kiwify';
+function toggleRival(){
+  const on=document.getElementById('usar_rival').checked;
+  document.getElementById('rival_section').style.display=on?'block':'none';
+  if(on)renderRivalForm();
+}
+function setRival(r){
+  currentRival=r;
+  document.querySelectorAll('.rival-tab').forEach(t=>t.classList.toggle('active',t.dataset.rival===r));
+  renderRivalForm();
+}
+let rivalMode='taxa';
+function setRivalMode(m){
+  rivalMode=m;
+  const tf=document.getElementById('rival_taxa_form');
+  const lf=document.getElementById('rival_liq_form');
+  const btnT=document.getElementById('rmb_taxa');
+  const btnL=document.getElementById('rmb_liq');
+  if(tf)tf.style.display=m==='taxa'?'block':'none';
+  if(lf)lf.style.display=m==='liq'?'block':'none';
+  if(btnT){btnT.classList.toggle('active',m==='taxa');}
+  if(btnL){btnL.classList.toggle('active',m==='liq');}
+}
+
+function buildModeToggle(labelTaxa='Tenho a taxa',labelLiq='Tenho os líquidos'){
+  return `<div class="radio-group" style="margin-bottom:14px">
+    <div class="radio-btn active" id="rmb_taxa" onclick="setRivalMode('taxa')">${labelTaxa}</div>
+    <div class="radio-btn" id="rmb_liq" onclick="setRivalMode('liq')">${labelLiq}</div>
+  </div>`;
+}
+
+function buildLiqTable(){
+  let html=`<div id="rival_liq_form" style="display:none">
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.5">Cole os valores do print. A taxa de parcelamento ao aluno será calculada automaticamente.</p>
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead><tr>
+        <th style="text-align:left;padding:5px 8px;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)">Parcelas</th>
+        <th style="padding:5px 8px;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)">Parcela do aluno (R$)</th>
+        <th style="padding:5px 8px;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)">Líquido produtor (R$)</th>
+      </tr></thead>
+      <tbody>`;
+  for(let n=1;n<=12;n++){
+    html+=`<tr>
+      <td style="padding:5px 8px;color:var(--muted);font-family:var(--mono)">${n}x${n===1?' (à vista)':''}</td>
+      <td style="padding:5px 4px"><input type="number" id="rv_parc_${n}" placeholder="ex: 187,61" step="0.01" oninput="decodificarRival()" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-family:var(--mono);font-size:12px;outline:none;-moz-appearance:textfield"></td>
+      <td style="padding:5px 4px"><input type="number" id="rv_liq_${n}" placeholder="ex: 969,02" step="0.01" oninput="decodificarRival()" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-family:var(--mono);font-size:12px;outline:none;-moz-appearance:textfield"></td>
+    </tr>`;
+  }
+  html+=`</tbody></table>
+    <div id="rival_decode_box" style="margin-top:12px"></div>
+  </div>`;
+  return html;
+}
+
+// Newton-Raphson: taxa implícita ao aluno
+function resolverTaxa(P,n,parc){
+  if(n<=1||parc<=0)return null;
+  let r=0.03;
+  for(let i=0;i<100;i++){
+    const fac=Math.pow(1+r,n);
+    const f=P*(r*fac)/(fac-1)-parc;
+    const df=P*(fac*(1+r*n-r*n*r)-r*r*fac)/Math.pow(fac-1,2);
+    const rn=r-f/(df||1e-10);
+    if(Math.abs(rn-r)<1e-8)return rn>0?rn:null;
+    r=rn;
+  }
+  return r>0?r:null;
+}
+
+function decodificarRival(){
+  const P=fv('P');
+  if(!P)return;
+  const db=document.getElementById('rival_decode_box');
+  if(!db)return;
+
+  const liq1=fv('rv_liq_1');
+  const fix=currentRival==='hubla'||currentRival==='kiwify'?2.49:0;
+  if(!liq1){db.innerHTML='';return;}
+
+  const fee1x=((P-liq1-fix)/P*100).toFixed(2);
+
+  let rows='';
+  let taxasAluno=[];
+  for(let n=2;n<=12;n++){
+    const parc=fv('rv_parc_'+n);
+    const liq=fv('rv_liq_'+n);
+    if(!parc||!liq)continue;
+    const r=resolverTaxa(P,n,parc);
+    const taxaAm=r?( r*100).toFixed(2):null;
+    if(taxaAm)taxasAluno.push(parseFloat(taxaAm));
+    const juros=parc*n-P;
+    const base=P*(1-parseFloat(fee1x)/100)-fix;
+    const repasseEst=juros>0?((liq-base)/juros*100).toFixed(0):null;
+    rows+=`<tr>
+      <td style="padding:4px 8px;font-family:var(--mono);color:var(--muted)">${n}x</td>
+      <td style="padding:4px 8px;font-family:var(--mono)">${taxaAm?taxaAm+'% a.m.':'—'}</td>
+      <td style="padding:4px 8px;font-family:var(--mono)">${repasseEst?repasseEst+'%':'—'}</td>
+    </tr>`;
+  }
+
+  const taxaMedia=taxasAluno.length?( taxasAluno.reduce((a,b)=>a+b,0)/taxasAluno.length).toFixed(2):null;
+
+  db.innerHTML=`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--hm);margin-bottom:8px">Decodificação</div>
+    <div style="font-size:12px;font-family:var(--mono);margin-bottom:${rows?'10px':'0'}">
+      Taxa fee (à vista): <strong>${fee1x}%</strong>${fix>0?' + R$'+fix.toFixed(2)+' fixo':''}
+      ${taxaMedia?`<br>Taxa ao aluno estimada: <strong>${taxaMedia}% a.m.</strong>`:''}
+    </div>
+    ${rows?`<table style="width:100%;border-collapse:collapse;font-size:11px">
+      <thead><tr>
+        <th style="text-align:left;padding:3px 8px;color:var(--subtle);font-size:9px;text-transform:uppercase;border-bottom:1px solid var(--border)">N</th>
+        <th style="padding:3px 8px;color:var(--subtle);font-size:9px;text-transform:uppercase;border-bottom:1px solid var(--border)">Taxa ao aluno</th>
+        <th style="padding:3px 8px;color:var(--subtle);font-size:9px;text-transform:uppercase;border-bottom:1px solid var(--border)">Repasse est.</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`:''}
+  </div>`;
+}
+
+function renderRivalForm(){
+  const f=document.getElementById('rival_form');
+  rivalMode='taxa';
+  if(currentRival==='kiwify'||currentRival==='hubla'){
+    const isH=currentRival==='hubla';
+    f.innerHTML=`<div class="card">
+      <div class="card-head"><div class="dot"></div>Condições ${isH?'Hubla':'Kiwify'}</div>
+      ${buildModeToggle()}
+      <div id="rival_taxa_form">
+        <div class="grid2">
+          <div class="field"><label>Taxa exibida na proposta (%)</label>
+            <input type="number" id="rv_taxa" value="${isH?'5.99':'6.99'}" step="0.01">
+            <span class="hint">${isH?'Taxa efetiva exibida — converte para MDR real automaticamente':'Taxa plana exibida na proposta'}</span>
+          </div>
+          <div class="field"><label>Taxa fixa por venda (R$)</label><input type="number" id="rv_fix" value="2.49" step="0.01"></div>
+          <div class="field"><label>Taxa de parcelamento ao aluno (% a.m.)</label>
+            <input type="number" id="rv_taxa_parc" value="3.19" step="0.01">
+            <span class="hint">Padrão: 3,19% a.m.</span>
+          </div>
+          <div class="field"><label>Repasse de parcelamento (%)</label>
+            <input type="number" id="rv_rep" value="${isH?'25':'50'}" step="1">
+            <span class="hint">% dos juros repassados ao produtor</span>
+          </div>
+        </div>
+      </div>
+      ${buildLiqTable()}
+    </div>`;
+  } else if(currentRival==='gateway'){
+    f.innerHTML=`<div class="card">
+      <div class="card-head"><div class="dot"></div>Condições Gateway / PagarMe</div>
+      ${buildModeToggle('Tenho os MDRs','Tenho os líquidos')}
+      <div id="rival_taxa_form">
+        <div class="grid2" style="margin-bottom:12px">
+          <div class="field"><label>Taxa fixa por transação (R$)</label><input type="number" id="gw_fix" value="0" step="0.01"></div>
+        </div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:8px">MDR por parcela (%) — CET incluindo antecipação</div>
+        <div id="gw_mdr_wrap" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px"></div>
+      </div>
+      ${buildLiqTable()}
+    </div>`;
+    const defaultMDR=[3.32,4.98,5.73,6.48,7.24,7.99,8.99,9.74,10.49,11.25,12.00,12.75];
+    const w=document.getElementById('gw_mdr_wrap');
+    for(let n=1;n<=12;n++){
+      const d=document.createElement('div');d.className='mix-item';
+      d.innerHTML=`<span>${n}x</span><input type="number" id="gw_mdr_${n}" value="${defaultMDR[n-1]}" step="0.01">`;
+      w.appendChild(d);
+    }
+  } else {
+    f.innerHTML=`<div class="card">
+      <div class="card-head"><div class="dot"></div>Condições do concorrente</div>
+      ${buildModeToggle('Taxa plana (Eduzz, outros)','Informar líquidos')}
+      <div id="rival_taxa_form">
+        <div class="grid2">
+          <div class="field"><label>Taxa (%)</label><input type="number" id="outro_taxa" value="4.99" step="0.01"></div>
+          <div class="field"><label>Taxa fixa (R$)</label><input type="number" id="outro_fix" value="0" step="0.01"></div>
+        </div>
+      </div>
+      ${buildLiqTable()}
+    </div>`;
+  }
+}
+
+// ── PESOS ────────────────────────────────────────────────────────────
+function getWeights(){
+  const pix=fv('pay_pix'),bol=fv('pay_bol'),cc=fv('pay_cc');
+  const mix=[];for(let n=1;n<=12;n++)mix.push(fv('mix_'+n));
+  const weights=[];
+  for(let n=1;n<=12;n++){
+    if(n===1)weights.push((cc/100)*(mix[0]/100)+(pix+bol)/100);
+    else weights.push((cc/100)*(mix[n-1]/100));
+  }
+  return weights;
+}
+
+// ── CALCULAR ─────────────────────────────────────────────────────────
+function calcular(){
+  const P=fv('P'),fat=fv('fat');
+  const nVendas=fat/P;
+  const weights=getWeights();
+
+  // 3 cenários HM
+  const scens=[];
+  [1,2,3].forEach(i=>{
+    const fee=fv('s'+i+'_fee'),rp=fv('s'+i+'_rp'),fix=fv('s'+i+'_fix');
+    const cobra=document.getElementById('s'+i+'_cobra_aluno')?.checked;
+    const ra=cobra?fv('s'+i+'_ra'):rp;
+    const nome=sv('s'+i+'_nome')||'Cenário '+i;
+    const liqs=[];
+    for(let n=1;n<=12;n++)liqs.push(hmLiq(P,fee,ra,rp,fix,n,cobra));
+    let avg=0;for(let n=0;n<12;n++)avg+=liqs[n]*weights[n];
+    scens.push({nome,fee,rp,ra,fix,cobra,liqs,avg,yr:avg*nVendas});
+  });
+
+  // Rival
+  const usaRival=document.getElementById('usar_rival')?.checked;
+  let rivalLiqs=null,rivalAvg=0,rivalNome='Concorrente',rivalYr=0;
+  if(usaRival){
+    rivalLiqs=[];
+    rivalNome=currentRival==='kiwify'?'Kiwify':currentRival==='hubla'?'Hubla':currentRival==='gateway'?'Gateway':'Outro';
+    const rivalCobraAluno=document.getElementById('rival_cobra_aluno')?.checked;
+    const usandoLiqs=rivalMode==='liq';
+
+    // Quando em modo líquidos, derivar taxa implícita ao aluno da parcela informada
+    let taxaParc=fv('rv_taxa_parc')||3.19;
+    if(usandoLiqs){
+      // Usar parcela de 6x para estimar taxa (mais representativa)
+      const P6=fv('rv_parc_6'),liq6=fv('rv_liq_6');
+      if(P6&&liq6){const r=resolverTaxa(P,6,P6);if(r)taxaParc=r*100;}
+    }
+
+    for(let n=1;n<=12;n++){
+      let rv=null;
+      if(usandoLiqs){
+        // Modo líquidos manuais — usar direto
+        rv=fv('rv_liq_'+n)||null;
+      } else if(currentRival==='kiwify'){
+        rv=kiwifyLiq(P,fv('rv_taxa'),fv('rv_fix'),fv('rv_rep'),n,rivalCobraAluno,taxaParc);
+      } else if(currentRival==='hubla'){
+        rv=hublaLiq(P,fv('rv_taxa'),fv('rv_fix'),fv('rv_rep'),n,rivalCobraAluno,taxaParc);
+      } else if(currentRival==='gateway'){
+        rv=gwLiq(P,fv('gw_mdr_'+n),fv('gw_fix'),n,rivalCobraAluno);
+      } else {
+        // Outro — taxa plana
+        const taxa=fv('outro_taxa'),fix=fv('outro_fix');
+        if(rivalCobraAluno){rv=P*(1-taxa/100)-fix;}
+        else{const r=taxaParc/100;const pvR=pvAnnuity(r,n,P/n);rv=pvR*(1-taxa/100)-fix;}
+      }
+      rivalLiqs.push(rv);
+    }
+    for(let n=0;n<12;n++)if(rivalLiqs[n]!=null)rivalAvg+=rivalLiqs[n]*weights[n];
+    rivalYr=rivalAvg*nVendas;
+  }
+
+  goTo(4);
+
+  // Cabeçalhos tabela
+  const colors=['s1c','s2c','s3c'];
+  [1,2,3].forEach(i=>document.getElementById('th_s'+i).textContent=scens[i-1].nome);
+  const thRv=document.getElementById('th_rv');
+  thRv.textContent=usaRival?rivalNome:'';
+  thRv.style.display=usaRival?'':'none';
+
+  // Ponto de equilíbrio
+  const be=document.getElementById('be_box');be.innerHTML='';
+  if(usaRival&&rivalAvg>0){
+    const melhor=scens.reduce((a,b)=>a.avg>b.avg?a:b);
+    if(rivalAvg>melhor.avg){
+      const econSeTrocasse=(rivalAvg-melhor.avg)*nVendas;
+      const pctPerdaNecessaria=((rivalAvg-melhor.avg)/rivalAvg)*100;
+      be.innerHTML=`<div style="background:var(--gold-bg);border:1px solid rgba(255,204,68,.2);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gold);margin-bottom:6px">Ponto de equilíbrio</div>
+        <div style="font-size:13px;color:var(--text);line-height:1.6">
+          ${rivalNome} está <strong>${fmtM(Math.abs(rivalYr-melhor.yr))}/ano</strong> melhor na tarifa pura.<br>
+          Basta perder <strong>${pctPerdaNecessaria.toFixed(1)}% do faturamento</strong> no ${rivalNome} para a troca não valer — 
+          isso equivale a <strong>${fmtM(fat*(pctPerdaNecessaria/100))}/ano</strong> em vendas a menos.
+        </div>
+      </div>`;
+    } else {
+      const vantagem=scens.reduce((a,b)=>a.yr>b.yr?a:b);
+      be.innerHTML=`<div style="background:var(--green-bg);border:1px solid rgba(68,204,136,.2);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--green);margin-bottom:6px">Hotmart já está melhor</div>
+        <div style="font-size:13px;color:var(--text);line-height:1.6">
+          ${vantagem.nome} supera ${rivalNome} em <strong>${fmtM(vantagem.yr-rivalYr)}/ano</strong>.
+        </div>
+      </div>`;
+    }
+  }
+
+  // Tabela
+  const tbody=document.getElementById('cmp_body');tbody.innerHTML='';
+  for(let n=1;n<=12;n++){
+    const w=weights[n-1];
+    const vals=scens.map(s=>s.liqs[n-1]);
+    if(usaRival&&rivalLiqs)vals.push(rivalLiqs[n-1]);
+    const bestV=Math.max(...vals.filter(v=>v!=null));
+    const tr=document.createElement('tr');
+    if([1,6,12].includes(n))tr.className='hl';
+    let html=`<td>${n}x${n===1?' (à vista)':''}</td><td style="color:var(--muted)">${(w*100).toFixed(1)}%</td>`;
+    const cls=['s1c','s2c','s3c'];
+    scens.forEach((s,i)=>{
+      const isBest=s.liqs[n-1]===bestV;
+      html+=`<td class="${isBest?'best '+cls[i]:cls[i]}">${fmt(s.liqs[n-1])}</td>`;
+    });
+    if(usaRival&&rivalLiqs){
+      const rv=rivalLiqs[n-1];
+      html+=`<td style="${rv===bestV?'font-weight:700':'color:var(--muted)'}">${fmt(rv)}</td>`;
+    } else if(usaRival){
+      html+=`<td>—</td>`;
+    }
+    // Melhor
+    const allLabels=[...scens.map(s=>s.nome),usaRival?rivalNome:null].filter(Boolean);
+    const bestIdx=vals.indexOf(bestV);
+    html+=`<td style="font-size:11px;font-weight:600;color:${bestIdx<3?['var(--hm)','var(--blue)','var(--gold)'][bestIdx]:'var(--muted)'}">${allLabels[bestIdx]||'—'}</td>`;
+    tr.innerHTML=html;tbody.appendChild(tr);
+  }
+}
+
+// ── NAVEGAÇÃO ─────────────────────────────────────────────────────────
+function goTo(n){
+  [1,2,3,4].forEach(i=>{
+    document.getElementById('page'+i).classList.toggle('active',i===n);
+    const s=document.querySelector(`.prog-step[data-step="${i}"]`);
+    if(s){s.classList.toggle('active',i===n);s.classList.toggle('done',i<n);}
+  });
+  window.scrollTo(0,0);
+}
+
+function resetar(){window.location.href=window.location.pathname;}
+
+// ── COMPARTILHAR (URL STATE) ──────────────────────────────────────────
+const CAMPOS_SIMPLES=['P','fat','pay_pix','pay_bol','pay_cc','s1_nome','s1_fee','s1_fix','s1_rp','s1_ra','s2_nome','s2_fee','s2_fix','s2_rp','s2_ra','s3_nome','s3_fee','s3_fix','s3_rp','s3_ra','rv_taxa','rv_fix','rv_taxa_parc','rv_rep','outro_taxa','outro_fix','gw_fix'];
+const CAMPOS_CHECK=['s1_cobra_aluno','s2_cobra_aluno','s3_cobra_aluno','usar_rival','rival_cobra_aluno'];
+
+function serializarEstado(){
+  const s={};
+  CAMPOS_SIMPLES.forEach(id=>{const el=document.getElementById(id);if(el)s[id]=el.value;});
+  CAMPOS_CHECK.forEach(id=>{const el=document.getElementById(id);if(el)s[id]=el.checked?'1':'0';});
+  for(let n=1;n<=12;n++){
+    ['mix_','rv_parc_','rv_liq_'].forEach(p=>{const el=document.getElementById(p+n);if(el&&el.value)s[p+n]=el.value;});
+    const gw=document.getElementById('gw_mdr_'+n);if(gw&&gw.value)s['gw_mdr_'+n]=gw.value;
+  }
+  s['_rival']=currentRival;s['_rivalMode']=rivalMode;
+  return s;
+}
+
+function deserializarEstado(s){
+  CAMPOS_SIMPLES.forEach(id=>{if(s[id]!==undefined){const el=document.getElementById(id);if(el)el.value=s[id];}});
+  CAMPOS_CHECK.forEach(id=>{if(s[id]!==undefined){const el=document.getElementById(id);if(el)el.checked=s[id]==='1';}});
+  for(let n=1;n<=12;n++){
+    ['mix_','rv_parc_','rv_liq_'].forEach(p=>{if(s[p+n]!==undefined){const el=document.getElementById(p+n);if(el)el.value=s[p+n];}});
+    if(s['gw_mdr_'+n]!==undefined){const el=document.getElementById('gw_mdr_'+n);if(el)el.value=s['gw_mdr_'+n];}
+  }
+  if(s['_rival'])currentRival=s['_rival'];
+  if(s['_rivalMode'])rivalMode=s['_rivalMode'];
+}
+
+function gerarURL(){
+  const s=serializarEstado();
+  const b64=btoa(unescape(encodeURIComponent(JSON.stringify(s))));
+  return window.location.origin+window.location.pathname+'#s='+b64;
+}
+
+function compartilhar(){
+  document.getElementById('share_url_box').value=gerarURL();
+  const modal=document.getElementById('share_modal');
+  modal.style.display='flex';
+  setTimeout(()=>document.getElementById('share_url_box').select(),50);
+}
+
+function fecharModal(){document.getElementById('share_modal').style.display='none';}
+
+function copiarURL(){
+  const box=document.getElementById('share_url_box');box.select();
+  const url=box.value;
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(url).then(flashCopiar).catch(()=>copiarFallback());
+  } else {copiarFallback();}
+}
+
+function copiarFallback(){
+  const box=document.getElementById('share_url_box');box.select();
+  try{document.execCommand('copy');flashCopiar();}
+  catch(e){document.getElementById('btn_copiar').textContent='Ctrl+C para copiar';}
+}
+
+function flashCopiar(){
+  const btn=document.getElementById('btn_copiar');
+  btn.textContent='✓ Copiado!';btn.style.background='var(--green)';btn.style.color='#000';
+  setTimeout(()=>{btn.textContent='Copiar link';btn.style.background='';btn.style.color='';},2200);
+}
+
+function carregarDaURL(){
+  const hash=window.location.hash;
+  if(!hash.startsWith('#s='))return false;
+  try{
+    const s=JSON.parse(decodeURIComponent(escape(atob(hash.slice(3)))));
+    if(s['_rival']){
+      document.getElementById('usar_rival').checked=true;
+      document.getElementById('rival_section').style.display='block';
+      currentRival=s['_rival'];renderRivalForm();
+      rivalMode=s['_rivalMode']||'taxa';setRivalMode(rivalMode);
+    }
+    deserializarEstado(s);
+    liveUpdate();onPay();onMix();updateScen();toggleRival();calcular();
+    return true;
+  }catch(e){console.warn('URL state inválido',e);return false;}
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────
+liveUpdate();onPay();onMix();updateScen();
+carregarDaURL();
+</script>
+</body>
+</html>
