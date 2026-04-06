@@ -155,6 +155,50 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito Sans',sans-serif
 .rival-tab.active{border-color:var(--hm);color:var(--hm);background:var(--hm-bg)}
 
 .section-sep{height:1px;background:var(--border);margin:20px 0}
+
+/* GUIA */
+.prog-step.guia-tab{padding:0 16px;opacity:.55}
+.prog-step.guia-tab.active{opacity:1;border-bottom-color:var(--muted)}
+.prog-step.guia-tab .prog-num{background:var(--surface2);color:var(--muted);border-color:var(--border2);font-size:12px;width:20px;height:20px}
+.guide-hero{margin-bottom:28px}
+.guide-hero-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--hm);font-family:var(--mono);margin-bottom:8px}
+.guide-hero-title{font-size:26px;font-weight:900;letter-spacing:-.5px;line-height:1.2;margin-bottom:10px}
+.guide-hero-title em{color:var(--hm);font-style:normal}
+.guide-hero-desc{font-size:13px;color:var(--muted);line-height:1.7;max-width:580px}
+.guide-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin:28px 0 14px;display:flex;align-items:center;gap:10px}
+.guide-section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.caso{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:10px;transition:border-color .15s}
+.caso:hover{border-color:var(--border2)}
+.caso-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.caso-num{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;font-family:var(--mono)}
+.c1 .caso-num{background:var(--hm-bg);color:var(--hm)}
+.c2 .caso-num{background:var(--blue-bg);color:var(--blue)}
+.c3 .caso-num{background:var(--gold-bg);color:var(--gold)}
+.c4 .caso-num{background:var(--green-bg);color:var(--green)}
+.caso-titulo{font-size:15px;font-weight:800;margin-bottom:2px}
+.caso-sub{font-size:12px;color:var(--muted);line-height:1.5}
+.guide-passos{display:flex;flex-direction:column}
+.guide-passo{display:flex;gap:12px;padding:9px 0;border-top:1px solid var(--border)}
+.guide-passo:first-child{border-top:none}
+.guide-passo-n{font-size:10px;font-weight:700;font-family:var(--mono);color:var(--subtle);width:22px;flex-shrink:0;padding-top:2px}
+.guide-passo-label{font-size:13px;font-weight:700;margin-bottom:3px}
+.guide-passo-desc{font-size:12px;color:var(--muted);line-height:1.6}
+.gtags{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.gtag{font-size:10px;font-family:var(--mono);padding:2px 7px;border-radius:4px;font-weight:600}
+.gtag-req{background:var(--hm-bg);color:var(--hm);border:1px solid rgba(255,75,0,.2)}
+.gtag-opt{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.gtag-tip{background:var(--green-bg);color:var(--green);border:1px solid rgba(0,201,122,.2)}
+.guide-tips{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.guide-tip{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.guide-tip-icon{font-size:16px;margin-bottom:5px}
+.guide-tip-title{font-size:12px;font-weight:800;margin-bottom:3px}
+.guide-tip-desc{font-size:11px;color:var(--muted);line-height:1.6}
+.guide-legenda{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.leg-row{display:flex;align-items:flex-start;gap:10px;padding:10px 16px;border-top:1px solid var(--border);font-size:12px}
+.leg-row:first-child{border-top:none}
+.leg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.leg-label{font-weight:700;min-width:120px;font-size:12px}
+.leg-desc{color:var(--muted);line-height:1.5;font-size:12px}
 </style>
 </head>
 <body>
@@ -174,6 +218,10 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito Sans',sans-serif
 </div>
 
 <div class="progress" id="progress_bar">
+  <div class="prog-step guia-tab" data-step="0" onclick="goTo(0)">
+    <div class="prog-num">?</div><div class="prog-label">Guia</div>
+  </div>
+  <div class="prog-sep"></div>
   <div class="prog-step active" data-step="1" onclick="goTo(1)">
     <div class="prog-num">1</div><div class="prog-label">Dados do cliente</div>
   </div>
@@ -193,8 +241,173 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito Sans',sans-serif
 
 <div class="main">
 
+<!-- GUIA -->
+<div class="page" id="page0">
+  <div class="guide-hero">
+    <div class="guide-hero-tag">Simulador de Tarifas · Uso interno AM</div>
+    <div class="guide-hero-title">Como usar em <em>4 minutos</em></div>
+    <div class="guide-hero-desc">Calcula o líquido real do produtor por forma de pagamento e parcela — considerando taxa, fixo, D30 e juros ao aluno. Use para preparar reuniões, responder propostas de concorrentes ou mostrar o impacto de uma nova condição.</div>
+  </div>
+
+  <div class="guide-section-title">Casos de uso</div>
+
+  <div class="caso c1">
+    <div class="caso-header">
+      <div class="caso-num">01</div>
+      <div>
+        <div class="caso-titulo">Mostrar o líquido atual do produtor</div>
+        <div class="caso-sub">Você quer mostrar quanto o produtor recebe hoje, parcela a parcela.</div>
+      </div>
+    </div>
+    <div class="guide-passos">
+      <div class="guide-passo">
+        <div class="guide-passo-n">P1</div>
+        <div>
+          <div class="guide-passo-label">Preencha os dados do produto</div>
+          <div class="guide-passo-desc">Preço e faturamento anual. O mix de pagamento pode ficar no padrão.</div>
+          <div class="gtags"><span class="gtag gtag-req">preço</span><span class="gtag gtag-req">faturamento</span><span class="gtag gtag-opt">mix opcional</span></div>
+        </div>
+      </div>
+      <div class="guide-passo">
+        <div class="guide-passo-n">P2</div>
+        <div>
+          <div class="guide-passo-label">Selecione "1 cenário" e preencha as condições atuais</div>
+          <div class="guide-passo-desc">Tarifa Hotmart, fixo por transação, taxa D30 e se cobra juros do aluno.</div>
+          <div class="gtags"><span class="gtag gtag-req">tarifa %</span><span class="gtag gtag-req">taxa D30</span><span class="gtag gtag-opt">fixo padrão R$1,00</span></div>
+        </div>
+      </div>
+      <div class="guide-passo">
+        <div class="guide-passo-n">P3</div>
+        <div>
+          <div class="guide-passo-label">Pule o concorrente e calcule</div>
+          <div class="guide-passo-desc">Deixe o toggle desligado e clique em Calcular. O resultado mostra o líquido e a parcela do aluno em cada prazo.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="caso c2">
+    <div class="caso-header">
+      <div class="caso-num">02</div>
+      <div>
+        <div class="caso-titulo">Comparar condição atual vs proposta Hotmart</div>
+        <div class="caso-sub">Você tem uma nova proposta de tarifa e quer mostrar o ganho real ao produtor.</div>
+      </div>
+    </div>
+    <div class="guide-passos">
+      <div class="guide-passo">
+        <div class="guide-passo-n">P2</div>
+        <div>
+          <div class="guide-passo-label">Selecione 2 ou 3 cenários</div>
+          <div class="guide-passo-desc">Cenário 1 = condição atual · Cenário 2 = proposta A · Cenário 3 = proposta B. Dê nomes descritivos a cada um.</div>
+          <div class="gtags"><span class="gtag gtag-req">tarifa e D30 de cada cenário</span><span class="gtag gtag-tip">nomeie os cenários</span></div>
+        </div>
+      </div>
+      <div class="guide-passo">
+        <div class="guide-passo-n">P4</div>
+        <div>
+          <div class="guide-passo-label">Compartilhe o link do resultado</div>
+          <div class="guide-passo-desc">Clique em 🔗 Compartilhar link. O produtor abre e já vê o comparativo pronto — sem instalar nada.</div>
+          <div class="gtags"><span class="gtag gtag-tip">perfeito para enviar no WhatsApp</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="caso c3">
+    <div class="caso-header">
+      <div class="caso-num">03</div>
+      <div>
+        <div class="caso-titulo">Responder proposta de Kiwify ou Hubla</div>
+        <div class="caso-sub">O produtor recebeu uma proposta de concorrente e você quer comparar com a Hotmart.</div>
+      </div>
+    </div>
+    <div class="guide-passos">
+      <div class="guide-passo">
+        <div class="guide-passo-n">P3</div>
+        <div>
+          <div class="guide-passo-label">Ative o concorrente, escolha a plataforma e o modo</div>
+        </div>
+      </div>
+      <div class="guide-passo">
+        <div class="guide-passo-n"></div>
+        <div>
+          <div class="guide-passo-label">Tenho a taxa — quando você sabe as condições da proposta</div>
+          <div class="guide-passo-desc">Preencha taxa %, fixo, taxa ao aluno e % de repasse de parcelamento.</div>
+          <div class="gtags"><span class="gtag gtag-req">taxa %</span><span class="gtag gtag-req">repasse %</span><span class="gtag gtag-opt">fixo padrão R$2,49</span><span class="gtag gtag-opt">taxa aluno padrão 3,19%</span></div>
+        </div>
+      </div>
+      <div class="guide-passo">
+        <div class="guide-passo-n"></div>
+        <div>
+          <div class="guide-passo-label">Tenho os líquidos — quando você tem o print da proposta</div>
+          <div class="guide-passo-desc">Cole parcela do aluno e líquido do produtor para cada prazo. A taxa implícita é calculada automaticamente.</div>
+          <div class="gtags"><span class="gtag gtag-req">líquido 1x</span><span class="gtag gtag-opt">demais linhas opcionais</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="caso c4">
+    <div class="caso-header">
+      <div class="caso-num">04</div>
+      <div>
+        <div class="caso-titulo">Responder proposta de Gateway / PagarMe</div>
+        <div class="caso-sub">O produtor está avaliando sair para um gateway próprio.</div>
+      </div>
+    </div>
+    <div class="guide-passos">
+      <div class="guide-passo">
+        <div class="guide-passo-n">P3</div>
+        <div>
+          <div class="guide-passo-label">Selecione Gateway / PagarMe e informe os MDRs</div>
+          <div class="guide-passo-desc">Os MDRs já vêm preenchidos com valores de mercado. Ajuste os que forem diferentes da proposta. O MDR deve incluir o custo de antecipação (CET).</div>
+          <div class="gtags"><span class="gtag gtag-req">MDR por parcela</span><span class="gtag gtag-opt">fixo por transação opcional</span><span class="gtag gtag-tip">ou use "Tenho os líquidos" se tiver o print</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="guide-section-title">Dicas rápidas</div>
+  <div class="guide-tips">
+    <div class="guide-tip">
+      <div class="guide-tip-icon">🔗</div>
+      <div class="guide-tip-title">Compartilhe o resultado</div>
+      <div class="guide-tip-desc">No Passo 4, clique em "Compartilhar link". O link abre o simulador já preenchido e calculado — perfeito para WhatsApp ou e-mail.</div>
+    </div>
+    <div class="guide-tip">
+      <div class="guide-tip-icon">📊</div>
+      <div class="guide-tip-title">Parcela do aluno</div>
+      <div class="guide-tip-desc">Na tabela de resultado, cada célula mostra o líquido do produtor e a parcela do aluno — em todos os cenários, inclusive o concorrente.</div>
+    </div>
+    <div class="guide-tip">
+      <div class="guide-tip-icon">⚖️</div>
+      <div class="guide-tip-title">Ponto de equilíbrio</div>
+      <div class="guide-tip-desc">Quando o concorrente parece melhor na tarifa, o simulador calcula quantas vendas o produtor precisaria perder para a troca não valer.</div>
+    </div>
+    <div class="guide-tip">
+      <div class="guide-tip-icon">💡</div>
+      <div class="guide-tip-title">Mix de parcelamento</div>
+      <div class="guide-tip-desc">Se souber que o produtor vende muito no 12x, ajuste o mix no Passo 1. Isso torna o líquido médio mais preciso.</div>
+    </div>
+  </div>
+
+  <div class="guide-section-title" style="margin-top:28px">Legenda dos campos</div>
+  <div class="guide-legenda">
+    <div class="leg-row"><div class="leg-dot" style="background:var(--hm)"></div><div class="leg-label">Tarifa (%)</div><div class="leg-desc">Percentual cobrado por venda (ex: 8,4%).</div></div>
+    <div class="leg-row"><div class="leg-dot" style="background:var(--blue)"></div><div class="leg-label">Fixo por transação</div><div class="leg-desc">Valor fixo por venda — Hotmart R$1,00 · Kiwify/Hubla R$2,49.</div></div>
+    <div class="leg-row"><div class="leg-dot" style="background:var(--gold)"></div><div class="leg-label">Taxa D30 (% a.m.)</div><div class="leg-desc">Taxa de antecipação cobrada do produtor para receber em 30 dias no parcelado.</div></div>
+    <div class="leg-row"><div class="leg-dot" style="background:var(--green)"></div><div class="leg-label">Taxa ao aluno (% a.m.)</div><div class="leg-desc">Taxa do parcelamento cobrada do aluno. Se maior que o D30, a diferença (spread) vai para o produtor.</div></div>
+    <div class="leg-row"><div class="leg-dot" style="background:var(--muted)"></div><div class="leg-label">Repasse (%)</div><div class="leg-desc">Nos concorrentes: % dos juros do parcelamento repassado ao produtor.</div></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="goTo(1)">Começar simulação →</button>
+  </div>
+</div>
+
 <!-- PASSO 1 -->
-<div class="page active" id="page1">
+<div class="page" id="page1">
   <div class="page-head">
     <div class="page-num">Passo 1 de 4</div>
     <div class="page-title">Dados do <em>cliente</em></div>
@@ -949,10 +1162,16 @@ function calcular(){
 
 // ── NAVEGAÇÃO ─────────────────────────────────────────────────────────
 function goTo(n){
-  [1,2,3,4].forEach(i=>{
-    document.getElementById('page'+i).classList.toggle('active',i===n);
+  [0,1,2,3,4].forEach(i=>{
+    const pg=document.getElementById('page'+i);
+    if(pg)pg.classList.toggle('active',i===n);
     const s=document.querySelector(`.prog-step[data-step="${i}"]`);
-    if(s){s.classList.toggle('active',i===n);s.classList.toggle('done',i<n);}
+    if(s){
+      s.classList.toggle('active',i===n);
+      // steps 1-4: marcar como done se já passados; step 0 (guia) nunca done
+      if(i>0)s.classList.toggle('done',i<n&&n>0);
+      else s.classList.remove('done');
+    }
   });
   window.scrollTo(0,0);
 }
@@ -1027,7 +1246,7 @@ function carregarDaURL(){
 
 // ── INIT ─────────────────────────────────────────────────────────────
 liveUpdate();onPay();onMix();updateScen();setNScen(1);
-carregarDaURL();
+if(!carregarDaURL()){goTo(0);}
 </script>
 </body>
 </html>
